@@ -1,117 +1,87 @@
+# import sys
+# import matplotlib.pyplot as plt
+# from PyQt5 import QtCore  # Import QtCore
+# from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+# from PyQt5 import QtWidgets, uic
+# import numpy as np
+# import resources_rc
+
+# class MainWindow(QtWidgets.QMainWindow):
+#     def __init__(self):
+#         super(MainWindow, self).__init__()
+#         uic.loadUi('interface.ui', self)
+
+#         # Assuming you want to add the graph to the first page of the QStackedWidget
+#         self.addGraphToPage(self.throttle_mapping, 0)
+
+#         self.show()
+
+#     def addGraphToPage(self, page, slider_id):
+#         # Create a figure and add it to the canvas
+#         fig = plt.figure()
+#         self.canvas = FigureCanvas(fig)
+#         page.layout().addWidget(self.canvas)
+
+#         # Create the 3D plot
+#         self.ax = fig.add_subplot(111, projection='3d')
+#         self.ax.set_facecolor('#000000')  # Dark mode background color
+#         fig.patch.set_facecolor('#000000') # Dark mode figure color
+
+#         # Create a slider for adjusting the gradient
+#         self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+#         self.slider.setMinimum(1)
+#         self.slider.setMaximum(100)
+#         self.slider.setValue(50)
+#         self.slider.valueChanged.connect(self.updateGraph)
+#         page.layout().addWidget(self.slider)
+
+#         # Initial plot
+#         self.updateGraph()
+
+#     def updateGraph(self):
+#         # Clear previous plot
+#         self.ax.clear()
+
+#         # Create a linear plane
+#         x = np.linspace(-5, 5, 100)
+#         y = np.linspace(-5, 5, 100)
+#         x, y = np.meshgrid(x, y)
+#         z = self.slider.value() / 50 * y  # Adjust the gradient based on the slider value
+
+#         # Plot the surface
+#         self.ax.plot_surface(x, y, z, cmap='viridis')
+
+#         # Update the canvas
+#         self.canvas.draw()
+
+# if __name__ == "__main__":
+#     app = QtWidgets.QApplication(sys.argv)
+#     window = MainWindow()
+#     sys.exit(app.exec_())
+
+
 import sys
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QWidget, QSlider, 
-                             QGridLayout, QPushButton, QComboBox, QLabel)
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from mpl_toolkits.mplot3d import Axes3D
+from PyQt5 import QtWidgets, uic
+import resources_rc  # Import the compiled resources
 
-class App(QMainWindow):
-
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
-        super().__init__()
-        self.left = 10
-        self.top = 10
-        self.title = 'GR24 ECU SOFTWARE TUNER V1.0.1'
-        self.width = 1000
-        self.height = 800
-        self.initUI()
+        super(MainWindow, self).__init__()
+        uic.loadUi('interface.ui', self)
 
-    def initUI(self):
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
+        # Connect buttons to the function to change pages
+        self.pushButton_6.clicked.connect(lambda: self.changePage(0))  # THROTTLE RESPONSE
+        self.pushButton_3.clicked.connect(lambda: self.changePage(1))  # LAUNCH CONTROL
+        self.pushButton_2.clicked.connect(lambda: self.changePage(2))  # REGEN PROFILE
+        self.pushButton.clicked.connect(lambda: self.changePage(3))    # ENERGY CONSUMPTION
+        self.pushButton_5.clicked.connect(lambda: self.changePage(4))  # RACE MODE PRESETS
 
-        # Main widget and layout
-        main_widget = QWidget(self)
-        self.setCentralWidget(main_widget)
-        layout = QGridLayout(main_widget)
+        self.show()
 
-        # Dropdown menu for presets
-        self.presetComboBox = QComboBox(self)
-        self.presetComboBox.addItem("Preset 1")
-        self.presetComboBox.addItem("Preset 2")
-        self.presetComboBox.addItem("Preset 3")
-        layout.addWidget(self.presetComboBox, 0, 0, 1, 2)
+    def changePage(self, page_index):
+        self.stackedWidget.setCurrentIndex(page_index)
 
-        # Space for logo
-        # make logo higher quality
-        self.logoLabel = QLabel(self)
-        logoPixmap = QPixmap('logo.png')  # Load your logo image
-        logoPixmap = logoPixmap.scaledToWidth(self.width // 5, Qt.SmoothTransformation)  # Scale the image width to 1/10th of the app width
-        self.logoLabel.setPixmap(logoPixmap)  # Set the pixmap to the label
-        self.logoLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)  # Align as needed
-        layout.addWidget(self.logoLabel, 0, 2, 1, 2)
-
-        # 2D plot setup with dark theme
-        self.figure_2d, self.ax_2d = plt.subplots()
-        self.figure_2d.patch.set_facecolor('black')
-        self.ax_2d.set_facecolor('black')
-        self.ax_2d.tick_params(axis='x', colors='white')
-        self.ax_2d.tick_params(axis='y', colors='white')
-        self.ax_2d.spines['bottom'].set_color('white')
-        self.ax_2d.spines['top'].set_color('white')
-        self.ax_2d.spines['right'].set_color('white')
-        self.ax_2d.spines['left'].set_color('white')
-        self.canvas_2d = FigureCanvas(self.figure_2d)
-        layout.addWidget(self.canvas_2d, 1, 0, 1, 2)
-        self.slider_2d = QSlider(Qt.Horizontal)
-        self.slider_2d.valueChanged[int].connect(self.updateGraph2D)
-        layout.addWidget(self.slider_2d, 2, 0, 1, 2)
-        self.x_2d = np.linspace(0, 2 * np.pi, 100)
-        self.y_2d = np.sin(self.x_2d)
-        self.plot_2d, = self.ax_2d.plot(self.x_2d, self.y_2d, color='white')
-
-        # 3D plot setup with dark theme
-        self.figure_3d = plt.figure()
-        self.ax_3d = self.figure_3d.add_subplot(111, projection='3d')
-        self.canvas_3d = FigureCanvas(self.figure_3d)
-        layout.addWidget(self.canvas_3d, 1, 2, 1, 2)
-        self.slider_3d = QSlider(Qt.Horizontal)
-        self.slider_3d.valueChanged[int].connect(self.updateGraph3D)
-        layout.addWidget(self.slider_3d, 2, 2, 1, 2)
-        self.X_3d, self.Y_3d = np.meshgrid(np.arange(-5, 5, 0.25), np.arange(-5, 5, 0.25))
-        self.Z_3d = np.sin(np.sqrt(self.X_3d**2 + self.Y_3d**2))
-        self.surf_3d = self.ax_3d.plot_surface(self.X_3d, self.Y_3d, self.Z_3d, cmap=cm.coolwarm)
-        self.set3DDarkTheme()
-
-        # Save Tune button
-        self.saveButton = QPushButton('Save Tune', self)
-        layout.addWidget(self.saveButton, 3, 3, 1, 1)
-        self.saveButton.clicked.connect(self.saveTune)
-
-    def set3DDarkTheme(self):
-        self.figure_3d.subplots_adjust(left=0, right=1, bottom=0, top=1)
-        self.ax_3d.set_facecolor('black')
-        self.ax_3d.w_xaxis.pane.fill = False
-        self.ax_3d.w_yaxis.pane.fill = False
-        self.ax_3d.w_zaxis.pane.fill = False
-        self.ax_3d.w_xaxis.line.set_color('black')  # Set the line color to black
-        self.ax_3d.w_yaxis.line.set_color('black')  # Set the line color to black
-        self.ax_3d.w_zaxis.line.set_color('black')  # Set the line color to black
-        self.ax_3d.tick_params(colors='white', labelsize=8)
-
-    def updateGraph2D(self, value):
-        self.y_2d = np.sin(self.x_2d + value / 10)
-        self.plot_2d.set_ydata(self.y_2d)
-        self.ax_2d.relim()
-        self.ax_2d.autoscale_view()
-        self.canvas_2d.draw()
-
-    def updateGraph3D(self, value):
-        self.Z_3d = np.sin(np.sqrt(self.X_3d**2 + self.Y_3d**2) + value / 10)
-        self.ax_3d.clear()
-        self.surf_3d = self.ax_3d.plot_surface(self.X_3d, self.Y_3d, self.Z_3d, cmap=cm.coolwarm)
-        self.set3DDarkTheme()  # Apply the dark theme settings after clearing the axes
-        self.canvas_3d.draw()
-
-    def saveTune(self):
-        print("Save Tune logic goes here")
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = App()
-    ex.show()
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
+    window = MainWindow()
     sys.exit(app.exec_())

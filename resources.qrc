@@ -1,0 +1,24 @@
+<RCC>
+  <qresource prefix="images">
+    <file>images/icons8-sd-50 (1).png</file>
+    <file>images/icons8-sd-50.png</file>
+    <file>images/icons8-speed-24.png</file>
+    <file>images/icons8-brake-discs-50.png</file>
+    <file>images/icons8-energy-50.png</file>
+    <file>images/icons8-expand-32.png</file>
+    <file>images/icons8-f1-car-80.png</file>
+    <file>images/icons8-graph-50.png</file>
+    <file>images/icons8-graph-64.png</file>
+    <file>images/icons8-minus-50.png</file>
+    <file>images/icons8-race-flag-64.png</file>
+    <file>images/icons8-x-50.png</file>
+    <file>images/icons8-menu-50.png</file>
+    <file>images/race-track.png</file>
+    <file>images/logo.png</file>
+  </qresource>
+  <qresource prefix="fonts">
+    <file>fonts/911porschav3condital.ttf</file>
+    <file>fonts/Calculator.ttf</file>
+    <file>fonts/Linebeam.ttf</file>
+  </qresource>
+</RCC>
