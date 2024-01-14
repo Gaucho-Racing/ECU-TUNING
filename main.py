@@ -70,16 +70,18 @@ class MainWindow(QtWidgets.QMainWindow):
         uic.loadUi('interface.ui', self)
 
         # Connect buttons to the function to change pages
-        self.pushButton_6.clicked.connect(lambda: self.changePage(0))  # THROTTLE RESPONSE
-        self.pushButton_3.clicked.connect(lambda: self.changePage(1))  # LAUNCH CONTROL
-        self.pushButton_2.clicked.connect(lambda: self.changePage(2))  # REGEN PROFILE
-        self.pushButton.clicked.connect(lambda: self.changePage(3))    # ENERGY CONSUMPTION
-        self.pushButton_5.clicked.connect(lambda: self.changePage(4))  # RACE MODE PRESETS
+        self.throttle_button.clicked.connect(lambda: self.changePage(0))  # THROTTLE RESPONSE
+        self.launch_button.clicked.connect(lambda: self.changePage(1))  # LAUNCH CONTROL
+        self.regen_button.clicked.connect(lambda: self.changePage(2))  # REGEN PROFILE
+        self.energy_button.clicked.connect(lambda: self.changePage(3))    # ENERGY CONSUMPTION
+        self.race_button.clicked.connect(lambda: self.changePage(4))  # RACE MODE PRESETS
 
         self.show()
 
     def changePage(self, page_index):
         self.stackedWidget.setCurrentIndex(page_index)
+        
+    
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

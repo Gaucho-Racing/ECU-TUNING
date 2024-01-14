@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1157</width>
-    <height>691</height>
+    <width>1023</width>
+    <height>611</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -115,7 +115,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_6">
+           <widget class="QPushButton" name="throttle_button">
             <property name="font">
              <font>
               <family>Andale Mono</family>
@@ -138,7 +138,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_3">
+           <widget class="QPushButton" name="launch_button">
             <property name="font">
              <font>
               <family>Andale Mono</family>
@@ -161,7 +161,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_2">
+           <widget class="QPushButton" name="regen_button">
             <property name="font">
              <font>
               <family>Andale Mono</family>
@@ -184,7 +184,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="energy_button">
             <property name="font">
              <font>
               <family>Andale Mono</family>
@@ -207,7 +207,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_5">
+           <widget class="QPushButton" name="race_button">
             <property name="font">
              <font>
               <family>Andale Mono</family>
@@ -847,7 +847,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1157</width>
+     <width>1023</width>
      <height>21</height>
     </rect>
    </property>
