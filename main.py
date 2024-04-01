@@ -18,13 +18,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.regen_button.clicked.connect(lambda: self.changePage(2))  # REGEN PROFILE
         self.energy_button.clicked.connect(lambda: self.changePage(3))    # ENERGY CONSUMPTION
         self.race_button.clicked.connect(lambda: self.changePage(4))  # RACE MODE PRESETS
+        self.flash_button.clicked.connect(self.updateSDCard) # update firmware to SD
+        
+        
+        # presets 1 - 4 
+        self.updateTorqueSettings = self.createTQSettingsSelect()
+        self.linear.layout().addWidget(self.updateTorqueSettings)
 
-        self.linear_throttle_fig, self.linear_throttle_ax = self.createLinearThrottleMap()
-        self.canvas_linear_throttle = FigureCanvas(self.linear_throttle_fig)
-        self.linear.layout().addWidget(self.canvas_linear_throttle)
-        self.slider_max_current, self.slide_current = self.createSlider("Max Current [Amps]", 0, 160)
-        self.settings.layout().addWidget(self.slider_max_current)
-        self.slide_current.valueChanged.connect(self.updateLinearThrottleMap)
+        
 
 
         self.rpm_fig, self.rpm_ax = self.createTorqueProfile()
@@ -72,7 +73,7 @@ class MainWindow(QtWidgets.QMainWindow):
             border-radius: 7px;
         }
         QSlider::sub-page:horizontal {
-            background: #ff0000;  
+            background: #9fff5e;  
             border-radius: 5px;
         }
     """)
@@ -89,59 +90,53 @@ class MainWindow(QtWidgets.QMainWindow):
         return widget, slider
         
     
-    def createLinearThrottleMap(self):
-        fig = Figure(figsize=(6, 3))  # Adjust the figsize as needed
-        ax = fig.add_subplot(111)
-        ax.set_facecolor('#000000')
-        fig.patch.set_facecolor('#000000')
-        ax.tick_params(axis='x', colors='white', labelsize=8)  # Adjust labelsize as needed
-        ax.tick_params(axis='y', colors='white', labelsize=8)  # Adjust labelsize as needed
-        ax.set_xlim(0, 170)
-        ax.set_ylim(0, 1)
-        ax.set_ylabel("Throttle Position", color='white', fontsize=8)  # Adjust fontsize as needed
-        ax.xaxis.set_label_position('top')  # Move x-label to the top
-        ax.set_xlabel("Current", color='red', fontsize=8, y=0.9)  # Adjust fontsize and y position as needed
-        ax.spines['bottom'].set_color('white')
-        ax.spines['top'].set_color('white')
-        ax.spines['right'].set_color('white')
-        ax.spines['left'].set_color('white')
-        return fig, ax
+    def createTQSettingsSelect(self):
+        # Create a horizontal layout
+        layout = QtWidgets.QHBoxLayout()
+
+        # Create the combo box for selecting presets
+        self.presetComboBox = QtWidgets.QComboBox()
+        # Add some placeholder presets (these could be loaded from a file)
+        self.presetComboBox.addItems(["LINEAR", "MAP_1", "MAP_2", "MAP_3"])
+        
+        # Create the load and save buttons
+        loadButton = QtWidgets.QPushButton("Load")
+        saveButton = QtWidgets.QPushButton("Save")
+        
+        # Connect the buttons to their respective slots
+        loadButton.clicked.connect(self.loadPreset)
+        saveButton.clicked.connect(self.savePreset)
+        
+        # Add the combo box and buttons to the layout
+        layout.addWidget(self.presetComboBox)
+        layout.addWidget(loadButton)
+        layout.addWidget(saveButton)
+        
+        # Create a widget to set the layout on
+        widget = QtWidgets.QWidget()
+        widget.setLayout(layout)
+        
+        return widget
 
 
-    def updateLinearThrottleMap(self):
-        # Store the current axis limits
-        xlim = self.linear_throttle_ax.get_xlim()
-        ylim = self.linear_throttle_ax.get_ylim()
+    # def updateTQSettingsSelect(self):
+    #     # For example, reload presets from a file or simply update the combo box items
+    #     # self.presetComboBox.clear()
+    #     # self.presetComboBox.addItems(["New Preset 1", "Preset 2", " Preset 3", "New Preset 4"])
+    #     # You might want to  call this method after saving a new preset to refresh the list
+    #     pass
         
-        x = np.linspace(0, 1)
-        limit = self.slide_current.value()
-        
-        y = limit * x
-        limit_line = np.ones(len(x)) * limit   
-        
-        # Update y based on the slider value, normalized to be between 0 and 1
-        # Clear and update the plot
-        self.linear_throttle_ax.clear()
-        self.linear_throttle_ax.set_ylabel("Throttle Position", color='white', fontsize=8)  # Adjust fontsize as needed
-        curr = "MAX CURRENT = " + str(limit) + "A"
-        self.linear_throttle_ax.xaxis.set_label_position('top')  # Move x-label to the top
-        if limit > 60:
-            self.linear_throttle_ax.set_xlabel(curr, color='red', fontsize=8, y=0.9)  # Adjust fontsize and y position as needed
-        else:
-            self.linear_throttle_ax.set_xlabel(curr, color='white', fontsize=8, y=0.9)  # Adjust fontsize and y position as needed
-        
-        self.linear_throttle_ax.tick_params(axis='x', colors='white', labelsize=8)  # Adjust labelsize as needed
-        self.linear_throttle_ax.tick_params(axis='y', colors='white', labelsize=8)  # Adjust labelsize as needed
+    def loadPreset(self):
+        # Placeholder for loading preset logic
+        currentPreset = self.presetComboBox.currentText()
+        print(f"Loading {currentPreset}")
+        # Actual loading logic goes here
 
-        self.linear_throttle_ax.plot(y, x, color='white')
-        self.linear_throttle_ax.plot(limit_line, x, color='red')
-        # Reset the axis limits to their original values
-        self.linear_throttle_ax.set_xlim(xlim)
-        self.linear_throttle_ax.set_ylim(ylim)
-        
-        # Redraw the canvas
-        self.canvas_linear_throttle.draw()  
-
+    def savePreset(self):
+        # Placeholder for save preset logic
+        print("Saving current settings as a new preset")
+        # Actual saving logic goes here
+        # self.updateTQSettingsSelect()  # Update the presets list after saving
     
     
     def createTorqueProfile(self):
@@ -152,7 +147,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # Set fixed limits for the axes
         ax.set_xlim(0, 1)
-        ax.set_ylim(0, 5000)
+        ax.set_ylim(0, 5500)
         ax.set_zlim(0, 100)
         
         # Add white axis labels
@@ -178,13 +173,13 @@ class MainWindow(QtWidgets.QMainWindow):
         zlim = self.rpm_ax.get_zlim()
 
         x = np.linspace(0, 1, 100)
-        y = np.linspace(0, 5000, 100)
+        y = np.linspace(0, 5500, 100)
         x, y = np.meshgrid(x, y)
         b = self.slide_b.value()/10.0
         p = self.slide_p.value()/10.0
         k = self.slide_k.value()/10.0
         
-        z = np.clip((x - (1-x)*(x + b)*((y/5000.0)**p)*k )*100, 0, 100)
+        z = np.clip((x - (1-x)*(x + b)*((y/5500.0)**p)*k )*100, 0, 100)
 
         # Clear and update the plot
         self.rpm_ax.clear()
@@ -202,6 +197,21 @@ class MainWindow(QtWidgets.QMainWindow):
         # Redraw the canvas
         self.canvas_rpm.draw()
 
+
+
+    def updateSDCard(self):
+        print("k = " + str(self.slide_k.value()/10.0))
+        print("p = " + str(self.slide_p.value()/10.0))
+        print("b = " + str(self.slide_b.value()/10.0))        
+
+        
+        print("done")
+        
+        
+        # in regen, make sure that the rear wheels lock after the front
+        
+    
+        
         
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
