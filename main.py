@@ -7,6 +7,15 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 class MainWindow(QtWidgets.QMainWindow):
     
+    # store presets of k, p, and b for each preset:
+    presets = {
+        "LINEAR": [0, 0, 0],
+        "MAP_1": [0, 0, 0],
+        "MAP_2": [0, 0, 0],
+        "MAP_3": [0, 0, 0]
+    }
+    
+    
     def __init__(self):
         super(MainWindow, self).__init__()
         uic.loadUi('interface.ui', self)
@@ -26,7 +35,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.linear.layout().addWidget(self.updateTorqueSettings)
 
         
-
+        
+        
 
         self.rpm_fig, self.rpm_ax = self.createTorqueProfile()
         self.canvas_rpm = FigureCanvas(self.rpm_fig)
@@ -99,17 +109,17 @@ class MainWindow(QtWidgets.QMainWindow):
         # Add some placeholder presets (these could be loaded from a file)
         self.presetComboBox.addItems(["LINEAR", "MAP_1", "MAP_2", "MAP_3"])
         
-        # Create the load and save buttons
-        loadButton = QtWidgets.QPushButton("Load")
+        # Connect the combo box's current index change signal to loadPreset
+        self.presetComboBox.currentIndexChanged.connect(self.loadPreset)
+        
+        # Create the save button
         saveButton = QtWidgets.QPushButton("Save")
         
-        # Connect the buttons to their respective slots
-        loadButton.clicked.connect(self.loadPreset)
+        # Connect the save button to its respective slot
         saveButton.clicked.connect(self.savePreset)
         
-        # Add the combo box and buttons to the layout
+        # Add the combo box and save button to the layout
         layout.addWidget(self.presetComboBox)
-        layout.addWidget(loadButton)
         layout.addWidget(saveButton)
         
         # Create a widget to set the layout on
@@ -119,24 +129,37 @@ class MainWindow(QtWidgets.QMainWindow):
         return widget
 
 
-    # def updateTQSettingsSelect(self):
-    #     # For example, reload presets from a file or simply update the combo box items
-    #     # self.presetComboBox.clear()
-    #     # self.presetComboBox.addItems(["New Preset 1", "Preset 2", " Preset 3", "New Preset 4"])
-    #     # You might want to  call this method after saving a new preset to refresh the list
-    #     pass
+    def updateTQSettingsSelect(self):
+        if(self.presetComboBox.currentText() == "LINEAR"):
+            self.slide_k.setValue(self.presets["LINEAR"][0])
+            self.slide_p.setValue(self.presets["LINEAR"][1])
+            self.slide_b.setValue(self.presets["LINEAR"][2])
+        elif(self.presetComboBox.currentText() == "MAP_1"):
+            self.slide_k.setValue(self.presets["MAP_1"][0])
+            self.slide_p.setValue(self.presets["MAP_1"][1])
+            self.slide_b.setValue(self.presets["MAP_1"][2])
+        elif(self.presetComboBox.currentText() == "MAP_2"):
+            self.slide_k.setValue(self.presets["MAP_2"][0])
+            self.slide_p.setValue(self.presets["MAP_2"][1])
+            self.slide_b.setValue(self.presets["MAP_2"][2])
+        elif(self.presetComboBox.currentText() == "MAP_3"):
+            self.slide_k.setValue(self.presets["MAP_3"][0])
+            self.slide_p.setValue(self.presets["MAP_3"][1])
+            self.slide_b.setValue(self.presets["MAP_3"][2])
         
     def loadPreset(self):
-        # Placeholder for loading preset logic
         currentPreset = self.presetComboBox.currentText()
         print(f"Loading {currentPreset}")
-        # Actual loading logic goes here
+        self.updateTQSettingsSelect()  # Update the presets list after loading
+
+
 
     def savePreset(self):
         # Placeholder for save preset logic
         print("Saving current settings as a new preset")
         # Actual saving logic goes here
-        # self.updateTQSettingsSelect()  # Update the presets list after saving
+        currentPreset = self.presetComboBox.currentText()
+        self.presets[currentPreset] = [self.slide_k.value(), self.slide_p.value(), self.slide_b.value()]
     
     
     def createTorqueProfile(self):
@@ -200,11 +223,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def updateSDCard(self):
-        print("k = " + str(self.slide_k.value()/10.0))
-        print("p = " + str(self.slide_p.value()/10.0))
-        print("b = " + str(self.slide_b.value()/10.0))        
+        # TODO: NOTE THAT THE VALUES MUST BE SCALED DOWN BY 10 ex: 0 - 50 -> 0 - 5.0
+        print(self.presets)
 
-        
         print("done")
         
         
@@ -217,4 +238,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     sys.exit(app.exec_())
+    # print the presets
+  
+    
 
