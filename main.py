@@ -16,10 +16,13 @@ class MainWindow(QtWidgets.QMainWindow):
     }
     
     
+    
     def __init__(self):
         super(MainWindow, self).__init__()
         uic.loadUi('interface.ui', self)
         self.setWindowTitle("GR24 PERFORMANCE TUNING")
+
+        self.is_loading_preset = False  # Add a flag to indicate when loading a preset
 
         # Connect buttons to the function to change pages
         self.throttle_button.clicked.connect(lambda: self.changePage(0))  # THROTTLE RESPONSE
@@ -45,12 +48,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.slider_multiplier, self.slide_k = self.createSlider("Multiplier [k]", 0, 50)
         self.settings.layout().addWidget(self.slider_multiplier)
         self.slide_k.valueChanged.connect(self.updateTorqueProfile)
+        self.slide_k.valueChanged.connect(self.savePreset)
+
+       
         self.slider_steepness, self.slide_p = self.createSlider("Steepness [p]", 0, 50)
         self.settings.layout().addWidget(self.slider_steepness)
         self.slide_p.valueChanged.connect(self.updateTorqueProfile)
+        self.slide_p.valueChanged.connect(self.savePreset)
+
         self.slider_offset, self.slide_b = self.createSlider("Offset [b]", 0, 10)
         self.settings.layout().addWidget(self.slider_offset)
         self.slide_b.valueChanged.connect(self.updateTorqueProfile)
+        self.slide_b.valueChanged.connect(self.savePreset)
         
         
 
@@ -112,15 +121,15 @@ class MainWindow(QtWidgets.QMainWindow):
         # Connect the combo box's current index change signal to loadPreset
         self.presetComboBox.currentIndexChanged.connect(self.loadPreset)
         
-        # Create the save button
-        saveButton = QtWidgets.QPushButton("Save")
+        # # Create the save button
+        # saveButton = QtWidgets.QPushButton("Save")
         
-        # Connect the save button to its respective slot
-        saveButton.clicked.connect(self.savePreset)
+        # # Connect the save button to its respective slot
+        # saveButton.clicked.connect(self.savePreset)
         
         # Add the combo box and save button to the layout
         layout.addWidget(self.presetComboBox)
-        layout.addWidget(saveButton)
+        # layout.addWidget(saveButton)
         
         # Create a widget to set the layout on
         widget = QtWidgets.QWidget()
@@ -130,34 +139,24 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def updateTQSettingsSelect(self):
-        if(self.presetComboBox.currentText() == "LINEAR"):
-            self.slide_k.setValue(self.presets["LINEAR"][0])
-            self.slide_p.setValue(self.presets["LINEAR"][1])
-            self.slide_b.setValue(self.presets["LINEAR"][2])
-        elif(self.presetComboBox.currentText() == "MAP_1"):
-            self.slide_k.setValue(self.presets["MAP_1"][0])
-            self.slide_p.setValue(self.presets["MAP_1"][1])
-            self.slide_b.setValue(self.presets["MAP_1"][2])
-        elif(self.presetComboBox.currentText() == "MAP_2"):
-            self.slide_k.setValue(self.presets["MAP_2"][0])
-            self.slide_p.setValue(self.presets["MAP_2"][1])
-            self.slide_b.setValue(self.presets["MAP_2"][2])
-        elif(self.presetComboBox.currentText() == "MAP_3"):
-            self.slide_k.setValue(self.presets["MAP_3"][0])
-            self.slide_p.setValue(self.presets["MAP_3"][1])
-            self.slide_b.setValue(self.presets["MAP_3"][2])
+        currentPreset = self.presetComboBox.currentText()
+        self.slide_k.setValue(self.presets[currentPreset][0])
+        self.slide_p.setValue(self.presets[currentPreset][1])
+        self.slide_b.setValue(self.presets[currentPreset][2])
+        
         
     def loadPreset(self):
+        self.is_loading_preset = True
         currentPreset = self.presetComboBox.currentText()
         print(f"Loading {currentPreset}")
         self.updateTQSettingsSelect()  # Update the presets list after loading
-
+        self.is_loading_preset = False
 
 
     def savePreset(self):
-        # Placeholder for save preset logic
+        if(self.is_loading_preset): 
+            return
         print("Saving current settings as a new preset")
-        # Actual saving logic goes here
         currentPreset = self.presetComboBox.currentText()
         self.presets[currentPreset] = [self.slide_k.value(), self.slide_p.value(), self.slide_b.value()]
     
@@ -225,7 +224,24 @@ class MainWindow(QtWidgets.QMainWindow):
     def updateSDCard(self):
         # TODO: NOTE THAT THE VALUES MUST BE SCALED DOWN BY 10 ex: 0 - 50 -> 0 - 5.0
         print(self.presets)
-
+        K_L = self.presets["LINEAR"][0]   
+        P_L = self.presets["LINEAR"][1] 
+        B_L = self.presets["LINEAR"][2]
+        K_M1 = self.presets["MAP_1"][0]
+        P_M1 = self.presets["MAP_1"][1]
+        B_M1 = self.presets["MAP_1"][2]
+        K_M2 = self.presets["MAP_2"][0]
+        P_M2 = self.presets["MAP_2"][1]
+        B_M2 = self.presets["MAP_2"][2]
+        K_M3 = self.presets["MAP_3"][0]
+        P_M3 = self.presets["MAP_3"][1]
+        B_M3 = self.presets["MAP_3"][2]
+        
+        # write to the SD card
+        # 1. open the file
+        
+        # 2. write the values
+        # 3. close the file
         print("done")
         
         
