@@ -169,7 +169,7 @@
              </font>
             </property>
             <property name="text">
-             <string> REGEN PROFILE     </string>
+             <string>PERFORMANCE VARIABLE</string>
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
@@ -192,7 +192,7 @@
              </font>
             </property>
             <property name="text">
-             <string>ENERGY CONSUMPTION</string>
+             <string>BATTERY CONFIG   </string>
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">

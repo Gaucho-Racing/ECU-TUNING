@@ -239,6 +239,23 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # write to the SD card
         # 1. open the file
+        '''
+        K1 P1 B1
+        K2 P2 B2
+        K3 P3 B3
+        K4 P4 B4
+        CMAX1 
+        CMAX2
+        CMAX3
+        CMAX4
+        REGEN1
+        REGEN2
+        REGEN3
+        REGEN4
+        TCPARAMS1 TCPARAMS2 TCPARAMS3
+        '''
+        torque_profile = f"{K_L/10.0} {P_L/10.0} {B_L/10.0}\n{K_M1/10.0} {P_M1/10.0} {B_M1/10.0}\n{K_M2/10.0} {P_M2/10.0} {B_M2/10.0}\n{K_M3/10.0} {P_M3/10.0} {B_M3/10.0}\n"            
+        print(torque_profile)
         
         # 2. write the values
         # 3. close the file
