@@ -15,6 +15,8 @@ class MainWindow(QtWidgets.QMainWindow):
         "MAP_3": [0, 0, 0]
     }
     
+    torque_data = np.zeros((20, 40))
+
     
     
     def __init__(self):
@@ -37,7 +39,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.updateTorqueSettings = self.createTQSettingsSelect()
         self.linear.layout().addWidget(self.updateTorqueSettings)
 
-        
+        # Create the 2D fuel table chart
+        self.fuel_table_fig, self.fuel_table_ax = self.createFuelTable()
+        self.canvas_fuel_table = FigureCanvas(self.fuel_table_fig)
+        self.rpm.layout().addWidget(self.canvas_fuel_table)  # Add to layout before the 3D graph
         
         
 
@@ -160,6 +165,19 @@ class MainWindow(QtWidgets.QMainWindow):
         currentPreset = self.presetComboBox.currentText()
         self.presets[currentPreset] = [self.slide_k.value(), self.slide_p.value(), self.slide_b.value()]
     
+    def createFuelTable(self):
+        fig = Figure(facecolor='black')
+        ax = fig.add_subplot(111, facecolor='black')
+
+        cax = ax.matshow(self.torque_data, cmap='hot')
+        fig.colorbar(cax)
+
+        ax.set_title("LOAD [AMPERES]", color='white')
+        ax.set_xlabel("MOTOR RPM", color='white')
+        ax.set_ylabel("REQ TORQUE", color='white')
+
+
+        return fig, ax
     
     def createTorqueProfile(self):
         fig = Figure()
@@ -218,6 +236,23 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Redraw the canvas
         self.canvas_rpm.draw()
+        
+        
+        for i in range(20):
+            for j in range(40):
+                rpm = 5500 * j / 40
+                throttle = 1 * i / 20
+                self.torque_data[i][j] = np.clip((throttle - (1-throttle)*(throttle + b)*((rpm/5500.0)**p)*k )*100, 0, 100)
+        
+        
+        self.fuel_table_ax.clear()
+        self.fuel_table_ax.set_title("LOAD [AMPERES]", color='white')
+        self.fuel_table_ax.set_xlabel("RPM", color='white')
+        self.fuel_table_ax.set_ylabel("REQ TORQUE", color='white')
+        self.fuel_table_ax.matshow(self.torque_data, cmap='hot', origin='upper')
+        self.canvas_fuel_table.draw()
+        
+        
 
 
 
