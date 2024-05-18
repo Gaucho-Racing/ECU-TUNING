@@ -146,7 +146,7 @@
              </font>
             </property>
             <property name="text">
-             <string> LAUNCH CONTROL    </string>
+             <string>VEHICLE SETTINGS</string>
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">
@@ -169,7 +169,7 @@
              </font>
             </property>
             <property name="text">
-             <string>PERFORMANCE VARIABLE</string>
+             <string>REGEN MAPPING</string>
             </property>
             <property name="icon">
              <iconset resource="resources.qrc">

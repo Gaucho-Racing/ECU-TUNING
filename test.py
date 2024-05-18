@@ -6,7 +6,7 @@ def send_one():
         # Instantiate the bus with specific settings
     #    /dev/tty.usbmodem139128701 
     #  /dev/tty.usbserial-2110
-        with can.interface.Bus(interface='seeedstudio', channel='/dev/tty.usbserial-2110', baud=1000000, frame_type='EXT', timeout=0.1, operation_mode='normal', bitrate=1000000) as bus:
+        with can.interface.Bus(interface='seeedstudio', channel='/dev/tty.usbserial-210', baud=1000000, frame_type='EXT', timeout=0.1, operation_mode='normal') as bus:
             msg = can.Message(
                 arbitration_id=0x6969, data=[0, 0, 0, 0, 0, 0, 0, 1], is_extended_id=True
             )
