@@ -115,33 +115,81 @@ class MainWindow(QtWidgets.QMainWindow):
         
     
     def createTQSettingsSelect(self):
-        # Create a horizontal layout
-        layout = QtWidgets.QHBoxLayout()
+        # Create a vertical layout
+        layout = QtWidgets.QVBoxLayout()
 
-        # Create the combo box for selecting presets
+        dropdown_label = QtWidgets.QLabel("TORQUE MAPPING PRESET:")
+        dropdown_label.setStyleSheet("font-size: 18px;")
         self.presetComboBox = QtWidgets.QComboBox()
-        # Add some placeholder presets (these could be loaded from a file)
         self.presetComboBox.addItems(["LINEAR", "MAP_1", "MAP_2", "MAP_3"])
         
-        # Connect the combo box's current index change signal to loadPreset
         self.presetComboBox.currentIndexChanged.connect(self.loadPreset)
+        self.presetComboBox.setStyleSheet("""
+            QComboBox {
+                font-size: 18px;  
+            }
+        """)
         
-        # # Create the save button
-        # saveButton = QtWidgets.QPushButton("Save")
+        dropdown = QtWidgets.QHBoxLayout()
+        dropdown.addWidget(dropdown_label)
+        dropdown.addWidget(self.presetComboBox)
+        layout.addLayout(dropdown)  
+
+        self.current_limit_sliders = []
+        self.slider_labels = []
+        for i in range(4):
+            slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+            slider.setMinimum(0)
+            slider.setMaximum(120)
+            slider.setFixedWidth(200)  # Set the fixed width of the slider
+            slider.setStyleSheet("""
+                QSlider::groove:horizontal {
+                    border: 1px solid #ccc;
+                    background: black;
+                    height: 10px;
+                    border-radius: 5px;
+                }
+                QSlider::handle:horizontal {
+                    background: qradialgradient(
+                        cx: 0.3, cy: -0.4, fx: 0.3, fy: -0.4,
+                        radius: 1.35, stop: 0 #fff, stop: 1 #777
+                    );
+                    width: 15px;
+                    margin-top: -2px;
+                    margin-bottom: -2px;
+                    border-radius: 7px;
+                }
+                QSlider::sub-page:horizontal {
+                    background: red;  
+                    border-radius: 5px;
+                }
+            """)
+            label = QtWidgets.QLabel(f"Current Limit {i+1}: {slider.value()} A")
+
+            # Update the label when the slider value changes
+            slider.valueChanged.connect(lambda value, lbl=label, idx=i: self.updateSliderLabel(value, lbl, idx))
+
+            # Create a horizontal layout for the label and slider
+            h_layout = QtWidgets.QHBoxLayout()
+            h_layout.addWidget(label)
+            h_layout.addStretch()  # Add a stretch to push the slider to the right
+            h_layout.addWidget(slider)
+
+            # Add the horizontal layout to the vertical layout
+            layout.addLayout(h_layout)
+
+            self.current_limit_sliders.append(slider)
+            self.slider_labels.append(label)
+
+        layout.addLayout(layout)
         
-        # # Connect the save button to its respective slot
-        # saveButton.clicked.connect(self.savePreset)
-        
-        # Add the combo box and save button to the layout
-        layout.addWidget(self.presetComboBox)
-        # layout.addWidget(saveButton)
-        
-        # Create a widget to set the layout on
         widget = QtWidgets.QWidget()
         widget.setLayout(layout)
         
         return widget
-
+    
+    def updateSliderLabel(self, value, label, idx):
+        label.setText(f"Current Limit {idx+1}: {value} A")
 
     def updateTQSettingsSelect(self):
         currentPreset = self.presetComboBox.currentText()
@@ -169,7 +217,7 @@ class MainWindow(QtWidgets.QMainWindow):
         fig = Figure(facecolor='black')
         ax = fig.add_subplot(111, facecolor='black')
 
-        cax = ax.matshow(self.torque_data, cmap='hot')
+        cax = ax.matshow(self.torque_data, cmap='hot', origin='lower')
         fig.colorbar(cax)
 
         ax.set_title("LOAD [AMPERES]", color='white')
@@ -249,7 +297,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.fuel_table_ax.set_title("LOAD [AMPERES]", color='white')
         self.fuel_table_ax.set_xlabel("RPM", color='white')
         self.fuel_table_ax.set_ylabel("REQ TORQUE", color='white')
-        self.fuel_table_ax.matshow(self.torque_data, cmap='hot', origin='upper')
+        self.fuel_table_ax.matshow(self.torque_data, cmap='hot', origin='lower')
         self.canvas_fuel_table.draw()
         
         
